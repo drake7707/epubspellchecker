@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="EpubSpellChecker.MainForm">
+    <Position X="0.5" Y="2.25" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ZYGKAEMQCDIKQBMDACKA4AgGSoxAAQhAB8AQQAAMhGk=</HashCode>
+      <FileName>MainForm.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="currentEpub" />
+      <Field Name="manager" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EpubSpellChecker.SpellCheckManager">
+    <Position X="4" Y="7" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAACABgAABAGAJQQAAAAACIAABBACAgAAAAAQAAAIAA=</HashCode>
+      <FileName>SpellCheckManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.Epub">
+    <Position X="4.25" Y="0.75" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="EpubSpellChecker.Epub.Entry">
+        <TypeIdentifier>
+          <NewMemberFileName>Domain\Epub.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="EpubSpellChecker.Epub.HtmlEntry">
+        <TypeIdentifier>
+          <NewMemberFileName>Domain\Epub.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAIEAACAAAGAAgAAAAAAAAAAAAAAEBAAAAAAAABA=</HashCode>
+      <FileName>Domain\Epub.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="file" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EpubSpellChecker.HighProbabilityTest" Collapsed="true">
+    <Position X="8.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\HighProbabilityTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.UnnecessaryHyphenTest" Collapsed="true">
+    <Position X="12" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\UnnecessaryHyphenTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.MissingSpacesTest" Collapsed="true">
+    <Position X="10.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAQAAAAAAAAiAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\MissingSpacesTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.NameTest" Collapsed="true">
+    <Position X="12" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\NameTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.NumberTest" Collapsed="true">
+    <Position X="8.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\NumberTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EpubSpellChecker.OCRErrorTest" Collapsed="true">
+    <Position X="10.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Suggestion Tests\OCRErrorTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ionic.Zip.ZipFile" Collapsed="true">
+    <Position X="8.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EpubSpellChecker.WordEntry">
+    <Position X="8.75" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAKIAAAQCAAAAIgIAAAAAAQAwAAAAEAAAAAACAACiAA=</HashCode>
+      <FileName>Domain\WordEntry.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Occurrences" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EpubSpellChecker.Word">
+    <Position X="13" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAgAACAAAAgAAAAAAAAAAAAAAAABIAAABCAAAAAA=</HashCode>
+      <FileName>Domain\Word.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
