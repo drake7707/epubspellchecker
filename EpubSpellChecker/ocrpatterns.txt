@@ -1,0 +1,50 @@
+#
+# OCR Patterns
+#
+# Use <-> for both testing replacements in both ways
+# Use -> if it may only be replaced in that direction
+#------------------------------
+#
+
+m <-> rn
+U -> li
+U -> ll
+U -> il
+li -> u
+li <-> il
+
+m <-> ru
+d <-> il
+d <-> tl
+i <-> l
+h <-> li
+m <-> rn
+im <-> un
+mn <-> ru
+nl <-> m
+t6 <-> to
+hi <-> lu
+id <-> ul
+ra <-> ru
+d -> tl
+nu <-> mi
+ii -> n
+ej -> ei
+dy -> tly
+ti -> tl
+m - ui
+di <-> th
+lh <-> th
+hl <-> bl
+tfr -> th
+ti <-> fi
+ii -> h
+hi <-> in
+ha <-> ba
+he <-> be
+ü <-> li
+ü <-> ti
+ii -> n
+lid -> ldi
+st -> sl
+orm -> om
