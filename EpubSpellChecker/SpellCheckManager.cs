@@ -64,6 +64,24 @@ namespace EpubSpellChecker
             }
 
             string replacedHtml = GetReplacedHtml(testHtml, pairs.ToArray());
+
+            
+            string text = "he stood upright. he stood with his back to the wall. be stood right on top of it.";
+            var wordList = GetWords("", text);
+            Dictionary<string, List<Word>> wordsOccurences = new Dictionary<string, List<Word>>();
+            // append the words to the occurence dictionary
+            foreach (var w in wordList)
+            {
+                List<Word> occurences;
+                if (!wordsOccurences.TryGetValue(w.Text.ToLower(), out occurences))
+                    wordsOccurences[w.Text.ToLower()] = occurences = new List<Word>();
+
+                occurences.Add(w);
+            }
+            var wordEntries = CreateWordEntriesFromOccurrences(wordsOccurences);
+
+            var wordEntry = wordEntries["be"];
+            HighProbabilityTest.Test(wordEntry);
         }
 
         /// <summary>
@@ -159,7 +177,12 @@ namespace EpubSpellChecker
         {
             // get a list of all words by their lower case string value
             Dictionary<string, List<Word>> wordsOccurences = GetWordsByText(epub);
+            var wordEntries = CreateWordEntriesFromOccurrences(wordsOccurences);
+            return wordEntries;
+        }
 
+        private Dictionary<string, WordEntry> CreateWordEntriesFromOccurrences(Dictionary<string, List<Word>> wordsOccurences)
+        {
             var wordEntries = new Dictionary<string, WordEntry>();
             foreach (var pair in wordsOccurences)
             {
@@ -171,6 +194,11 @@ namespace EpubSpellChecker
                 wordEntries.Add(we.Text.ToLower(), we);
             }
 
+            // complete the word entries with its neighbour data
+            foreach (var we in wordEntries.Values)
+            {
+                FillNeighbours(we, wordEntries);
+            }
             return wordEntries;
         }
 
@@ -372,6 +400,48 @@ namespace EpubSpellChecker
         }
 
         /// <summary>
+        /// Fills the neighbours of the word entry, along with how many times the neighbour occurred over the word occurrences
+        /// </summary>
+        /// <param name="we">The word entry to fill the neighbours for</param>
+        /// <param name="wordEntries">A collection of all the word entries</param>
+        public void FillNeighbours(WordEntry we, Dictionary<string, WordEntry> wordEntries)
+        {
+            var neighbour = new WordEntry.NeighbourWords();
+            neighbour.PreviousWords = new Dictionary<WordEntry, int>();
+            neighbour.NextWords = new Dictionary<WordEntry, int>();
+
+            foreach (var w in we.Occurrences)
+            {
+                if (!w.IsStartOfSentence && w.Previous != null)
+                {
+                    WordEntry entryOfW;
+                    if (wordEntries.TryGetValue(w.Previous.Text.ToLower(), out entryOfW))
+                    {
+                        int count;
+                        if (!neighbour.PreviousWords.TryGetValue(entryOfW, out count))
+                            neighbour.PreviousWords[entryOfW] = count = 1;
+                        else
+                            neighbour.PreviousWords[entryOfW] = ++count;
+                    }
+                }
+
+                if (w.Next != null && !w.Next.IsStartOfSentence)
+                {
+                    WordEntry entryOfW;
+                    if (wordEntries.TryGetValue(w.Next.Text.ToLower(), out entryOfW))
+                    {
+                        int count;
+                        if (!neighbour.NextWords.TryGetValue(entryOfW, out count))
+                            neighbour.NextWords[entryOfW] = count = 1;
+                        else
+                            neighbour.NextWords[entryOfW] = ++count;
+                    }
+                }
+            }
+            we.Neighbours = neighbour;
+        }
+
+        /// <summary>
         /// Fills the suggestion of a word entry
         /// </summary>
         /// <param name="we">The word entry to fill the suggestion for</param>
@@ -380,8 +450,11 @@ namespace EpubSpellChecker
         public void FillSuggestion(WordEntry we, Dictionary<string, WordEntry> wordEntries, Dictionary<string, Dictionary<string, int>> ocrPatternsAppliedCount)
         {
             if (!we.IsUnknownWord)
+            {
                 // it's a word that is known, ignore and don't fill a suggestion
+
                 we.Ignore = true;
+            }
             else
             {
                 // build the dictionary suggestions
@@ -389,7 +462,8 @@ namespace EpubSpellChecker
                 if (we.IsUnknownWord && !we.Ignore && string.IsNullOrEmpty(we.Suggestion))
                     we.DictionarySuggesions = fullDictionary
                                                     .Where(s => (char.ToLower(s[0]) == char.ToLower(we.Text[0]) || s.Last() == char.ToLower(we.Text.Last())) && Math.Abs(s.Length - we.Text.Length) <= 2) // only take the words that have a max 2 char length deviation
-                                                    .OrderByDescending(s => s.GetSimilarPercentage(we.Text.ToLower())).Take(5).ToArray();
+                                                    .OrderBy(s => s.GetDistance(we.Text.ToLower())).Take(5).ToArray();
+
 
                 // test for numbers
                 NumberTest.Test(we);
@@ -430,6 +504,9 @@ namespace EpubSpellChecker
                 // test for high probability
                 HighProbabilityTest.Test(we);
 
+                // test for probability on neighbours
+                HighProbabilityOnNeighboursTest.Test(we, false);
+
                 // test for missing spaces
                 MissingSpacesTest.Test(we, wordEntries, fullDictionary);
             }
@@ -443,8 +520,8 @@ namespace EpubSpellChecker
         /// <param name="ocrPatternsAppliedCount">A collection that keeps track of which ocr patterns have been applied and how many times</param>
         public void FillWarnings(WordEntry we, Dictionary<string, WordEntry> wordEntries, Dictionary<string, Dictionary<string, int>> ocrPatternsAppliedCount)
         {
-            if (!we.IsUnknownWord)
-            {
+            //if (true || !we.IsUnknownWord)
+            //{
                 foreach (var patternPair in ocrPatternsAppliedCount)
                 {
                     foreach (var patternValue in patternPair.Value)
@@ -476,7 +553,9 @@ namespace EpubSpellChecker
                         }
                     }
                 }
-            }
+            //}
+
+                HighProbabilityOnNeighboursTest.Test(we, true);
         }
 
         /// <summary>

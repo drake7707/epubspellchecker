@@ -49,5 +49,10 @@ namespace EpubSpellChecker
         /// The next word in the text, if the next word will be the start of a new sentence, this will be null
         /// </summary>
         public Word Next { get; set; }
+
+        public override string ToString()
+        {
+            return "Word: " + Text;
+        }
     }
 }
