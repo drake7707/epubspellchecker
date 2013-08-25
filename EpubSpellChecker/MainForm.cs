@@ -163,7 +163,7 @@ namespace EpubSpellChecker
 
                     // update the progress
                     state.Progress = count++ / (float)wordEntries.Count;
-                    state.Text = "Building suggestions (" + count + " / " + wordEntries.Count + ")";
+                    state.Text = "Building warnings (" + count + " / " + wordEntries.Count + ")";
                 }
                 return true;
             }, isComplete =>
@@ -652,12 +652,14 @@ namespace EpubSpellChecker
 
                 var textEntry = currentEpub.Entries[w.Href] as Epub.HtmlEntry;
 
+                int displayLength = 60;
+
                 // determine the max length of the text before and after the word
-                int min = Math.Max(w.CharOffset - 30, 0);
-                int length = w.CharOffset + w.Text.Length + 30 > textEntry.Html.Length ? textEntry.Html.Length - (w.CharOffset + w.Text.Length) : 30;
+                int min = Math.Max(w.CharOffset - displayLength, 0);
+                int length = w.CharOffset + w.Text.Length + displayLength > textEntry.Html.Length ? textEntry.Html.Length - (w.CharOffset + w.Text.Length) : displayLength;
 
                 // build the text before and after the text
-                string prefix = "..." + textEntry.Html.Substring(min, 30).Replace("\r", "").Replace("\n", "");
+                string prefix = "..." + textEntry.Html.Substring(min, displayLength).Replace("\r", "").Replace("\n", "");
                 // todo: this won't correctly display if the text is broken into pieces with tags inbetween. Don't use w.Text.Length, but use the last char offset instead
                 string postfix = textEntry.Html.Substring(w.CharOffset + w.Text.Length, length).Replace("\r", "").Replace("\n", "") + "...";
 

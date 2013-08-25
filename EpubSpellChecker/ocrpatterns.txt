@@ -16,7 +16,7 @@ li <-> il
 m <-> ru
 d <-> il
 d <-> tl
-i <-> l
+it -> tt
 h <-> li
 m <-> rn
 im <-> un
@@ -48,3 +48,6 @@ ii -> n
 lid -> ldi
 st -> sl
 orm -> om
+m -> th
+i <-> l
+l -> f

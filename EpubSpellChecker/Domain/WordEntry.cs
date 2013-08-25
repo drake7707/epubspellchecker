@@ -45,6 +45,16 @@ namespace EpubSpellChecker
         /// </summary>
         public Word[] Occurrences { get; private set; }
 
+        /// <summary>
+        /// Contains how much the same previous and next words are encountered over all the occurrences
+        /// </summary>
+        public NeighbourWords Neighbours { get; set; }
+
+        public class NeighbourWords
+        {
+            public Dictionary<WordEntry, int> PreviousWords { get; set; }
+            public Dictionary<WordEntry, int> NextWords { get; set; }
+        }
 
         private string fixedText;
         /// <summary>
@@ -116,6 +126,12 @@ namespace EpubSpellChecker
             {
                 return IsUnknownWord || IsWarning;
             }
+        }
+
+
+        public override string ToString()
+        {
+            return "Entry: " + Text + " [" + Count + "]";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

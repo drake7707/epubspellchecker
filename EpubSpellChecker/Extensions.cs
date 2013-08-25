@@ -11,19 +11,37 @@ namespace EpubSpellChecker
 {
     public static class Extensions
     {
+
+
+        //private static Dictionary<KeyValuePair<string, string>, float> similarPercentageCache = new Dictionary<KeyValuePair<string, string>, float>();
+
         /// <summary>
-        /// Returns a percentage of how similar 2 strings are, based on the levenshtein edit distance
+        /// Returns a percentage of how similar 2 strings are, based on the levenshtein edit distance.
         /// </summary>
         /// <param name="str">The first string</param>
         /// <param name="str2">The second string to compare to the first</param>
         /// <returns>A percentage [0-1] that determines the similarity</returns>
         public static float GetSimilarPercentage(this string str, string str2)
         {
-            var dist = EditDistance(str, str2);
-            if (str.Length > str2.Length)
-                return (str.Length - dist) / (float)str.Length;
-            else
-                return (str2.Length - dist) / (float)str2.Length;
+            float value;
+            //if (!similarPercentageCache.TryGetValue(new KeyValuePair<string, string>(str, str2), out value))
+            //{
+                var dist = EditDistance(str, str2);
+                if (str.Length > str2.Length)
+                    value = (str.Length - dist) / (float)str.Length;
+                else
+                    value = (str2.Length - dist) / (float)str2.Length;
+
+                // store the value in a cache, so if the same comparison comes up again we can reuse it
+                //lock (similarPercentageCache) // prevent problems in deadlock cases
+                //    similarPercentageCache[new KeyValuePair<string, string>(str, str2)] = value;
+            //}
+            return value;
+        }
+
+        public static float GetDistance(this string str, string str2)
+        {
+            return EditDistance(str, str2);
         }
 
         /// <SUMMARY>
