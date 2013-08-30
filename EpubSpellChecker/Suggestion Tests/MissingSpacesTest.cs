@@ -123,6 +123,10 @@ namespace EpubSpellChecker
                 {
                     // ignore, it gives too many false positives
                 }
+                else if (wc.Any(w => w.Key.Length >= 2 && IsOnlyConsonants(w.Key) || IsOnlyVowels(w.Key)))
+                {
+                    // ignore, this will remove some splitting to abbreviations
+                }
                 else
                 {
                     // less parts -> better
@@ -139,6 +143,28 @@ namespace EpubSpellChecker
 
             // returns the word path in a string with spaces between each piece
             return string.Join(" ", max.Select(l => l.Key));
+        }
+
+        private static HashSet<char> VOWELS = new HashSet<char>(new char[] { 'a', 'e', 'i','o', 'u', 'y' });
+
+        /// <summary>
+        /// Checks if  a string only contains vowels
+        /// </summary>
+        /// <param name="str">The string to check</param>
+        /// <returns>True if all the characters are vowels</returns>
+        private static bool IsOnlyVowels(string str)
+        {
+            return !str.Any(ch => !VOWELS.Contains(ch));
+        }
+
+        /// <summary>
+        /// Checks if  a string only contains consonants
+        /// </summary>
+        /// <param name="str">The string to check</param>
+        /// <returns>True if all the characters are consonants</returns>
+        private static bool IsOnlyConsonants(string str)
+        {
+            return !str.Any(ch => VOWELS.Contains(ch));
         }
 
         /// <summary>

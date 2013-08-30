@@ -152,11 +152,12 @@ namespace EpubSpellChecker
                 state.Text = "Analyzing possible OCR errors on valid words...";
                 int count = 0;
 
-                foreach (var we in wordEntries.Values)
+                Parallel.ForEach(wordEntries.Values, (we, loop) =>
                 {
-                    // bail out if the action was cancelled
+                    // if the action was cancelled, break the loop to stop processing
                     if (state.Cancel)
-                        return false;
+                        loop.Break();
+
 
                     // check for warning on the current word entry
                     manager.FillWarnings(we, wordEntries, ocrPatternsAppliedCount);
@@ -164,7 +165,12 @@ namespace EpubSpellChecker
                     // update the progress
                     state.Progress = count++ / (float)wordEntries.Count;
                     state.Text = "Building warnings (" + count + " / " + wordEntries.Count + ")";
-                }
+                });
+
+                // if the action was cancelled, don't continue
+                if (state.Cancel)
+                    return false;
+
                 return true;
             }, isComplete =>
             {
@@ -661,7 +667,7 @@ namespace EpubSpellChecker
                 // build the text before and after the text
                 string prefix = "..." + textEntry.Html.Substring(min, displayLength).Replace("\r", "").Replace("\n", "");
                 // todo: this won't correctly display if the text is broken into pieces with tags inbetween. Don't use w.Text.Length, but use the last char offset instead
-                string postfix = textEntry.Html.Substring(w.CharOffset + w.Text.Length, length).Replace("\r", "").Replace("\n", "") + "...";
+                string postfix = textEntry.Html.Substring(w.OriginalCharPositions.Last() + 1, length).Replace("\r", "").Replace("\n", "") + "...";
 
                 using (var boldFont = new Font(lstOccurrences.Font, FontStyle.Bold))
                 {
