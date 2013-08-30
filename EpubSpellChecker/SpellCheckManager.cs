@@ -65,7 +65,7 @@ namespace EpubSpellChecker
 
             string replacedHtml = GetReplacedHtml(testHtml, pairs.ToArray());
 
-            
+
             string text = "he stood upright. he stood with his back to the wall. be stood right on top of it.";
             var wordList = GetWords("", text);
             Dictionary<string, List<Word>> wordsOccurences = new Dictionary<string, List<Word>>();
@@ -244,7 +244,9 @@ namespace EpubSpellChecker
             // the current tag depth (++ each time < is encountered not between quotes, -- when >)
             int tagDepth = 0;
             // flags if the current position is between quotes
-            bool inQuotes = false;
+            bool inSingleQuotes = false;
+            bool inDoubleQuotes = false;
+
             // the current position
             int idx = 0;
             // flags if the current position is between <style> ... </style>. This is necessary to prevent tagDepth changes when css with > is encountered
@@ -270,7 +272,7 @@ namespace EpubSpellChecker
 
                 if (input[idx] == '<')
                 {
-                    if (!inQuotes) // if not encountered in quotes, it's the start of a tag
+                    if (!inSingleQuotes && !inDoubleQuotes) // if not encountered in quotes, it's the start of a tag
                         tagDepth++;
                     else
                     {
@@ -283,7 +285,7 @@ namespace EpubSpellChecker
                 }
                 else if (input[idx] == '>')
                 {
-                    if (!inQuotes) // if not encountered in quotes, it's the end of a tag
+                    if (!inSingleQuotes && !inDoubleQuotes) // if not encountered in quotes, it's the end of a tag
                     {
                         if (tagDepth > 0)
                             tagDepth--;
@@ -297,11 +299,26 @@ namespace EpubSpellChecker
                         }
                     }
                 }
-                else if (input[idx] == '\"' || input[idx] == '\'')
+                else if (input[idx] == '\"')
                 {
                     if (tagDepth > 0) // only detect quotes when the current position is inside a tag
                     {
-                        inQuotes = !inQuotes;
+                        if (!inSingleQuotes) // when not surrounded by single quotes
+                            inDoubleQuotes = !inDoubleQuotes;
+                    }
+                    else
+                    {
+                        // otherwise append it, it's part of the text
+                        str.Append(input[idx]);
+                        originalOffsets.Add(idx);
+                    }
+                }
+                else if (input[idx] == '\'')
+                {
+                    if (tagDepth > 0) // only detect quotes when the current position is inside a tag
+                    {
+                        if (!inDoubleQuotes) // when not surrounded by double quotes
+                            inSingleQuotes = !inSingleQuotes;
                     }
                     else
                     {
@@ -312,7 +329,7 @@ namespace EpubSpellChecker
                 }
                 else if (input[idx] == '&')
                 {
-                    if (!inStyleBlock && !inQuotes && tagDepth == 0)
+                    if (!inStyleBlock && !inSingleQuotes && !inDoubleQuotes && tagDepth == 0)
                     {
                         // read until encountering ';' because this is a xml escaped word
                         StringBuilder escapedWord = new StringBuilder("");
@@ -522,40 +539,40 @@ namespace EpubSpellChecker
         {
             //if (true || !we.IsUnknownWord)
             //{
-                foreach (var patternPair in ocrPatternsAppliedCount)
+            foreach (var patternPair in ocrPatternsAppliedCount)
+            {
+                foreach (var patternValue in patternPair.Value)
                 {
-                    foreach (var patternValue in patternPair.Value)
+                    int nrTimesApplied = patternValue.Value;
+                    if (nrTimesApplied > 2) // at least 2 times // Todo make configurable
                     {
-                        int nrTimesApplied = patternValue.Value;
-                        if (nrTimesApplied > 2) // at least 2 times // Todo make configurable
+                        // check if the pattern matches the current word entry
+                        var matches = Regex.Matches(we.Text, patternPair.Key);
+                        foreach (var m in matches.Cast<Match>())
                         {
-                            // check if the pattern matches the current word entry
-                            var matches = Regex.Matches(we.Text, patternPair.Key);
-                            foreach (var m in matches.Cast<Match>())
+                            // for all matches, determine the new word and check if it is present in the dictionary
+                            var newWord = we.Text.Substring(0, m.Index) + patternValue.Key + we.Text.Substring(m.Index + m.Length);
+                            if (fullDictionary.Contains(newWord.ToLower()))
                             {
-                                // for all matches, determine the new word and check if it is present in the dictionary
-                                var newWord = we.Text.Substring(0, m.Index) + patternValue.Key + we.Text.Substring(m.Index + m.Length);
-                                if (fullDictionary.Contains(newWord.ToLower()))
+                                // the pattern applied on the word also exists (e.g rale -> rule)
+                                // check if rule exists as well in the word entries
+                                WordEntry targetWordEntry;
+                                if (wordEntries.TryGetValue(newWord.ToLower(), out targetWordEntry) && targetWordEntry.Occurrences.Length > 0)
                                 {
-                                    // the pattern applied on the word also exists (e.g rale -> rule)
-                                    // check if rule exists as well in the word entries
-                                    WordEntry targetWordEntry;
-                                    if (wordEntries.TryGetValue(newWord.ToLower(), out targetWordEntry) && targetWordEntry.Occurrences.Length > 0)
-                                    {
-                                        // the new word also exists in the book, flag the word as a warning
-                                        we.IsWarning = true;
-                                        we.UnknownType = "Possible OCR error";
-                                        we.Suggestion = newWord;
-                                        return;
-                                    }
+                                    // the new word also exists in the book, flag the word as a warning
+                                    we.IsWarning = true;
+                                    we.UnknownType = "Possible OCR error";
+                                    we.Suggestion = newWord;
+                                    return;
                                 }
                             }
                         }
                     }
                 }
+            }
             //}
 
-                HighProbabilityOnNeighboursTest.Test(we, true);
+            HighProbabilityOnNeighboursTest.Test(we, true);
         }
 
         /// <summary>

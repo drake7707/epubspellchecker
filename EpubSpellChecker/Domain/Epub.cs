@@ -125,7 +125,7 @@ namespace EpubSpellChecker
                     string mimeType = item.Attributes["media-type"].Value;
 
                     // if the entry is a html file
-                    if (mimeType == "application/xhtml+xml" || mimeType.Contains("html"))
+                    if (mimeType == "application/xhtml+xml" || mimeType.Contains("html") || mimeType.Contains("xml"))
                     {
                         // extract the file to a a memory stream and read it to a string
                         using (MemoryStream ms = new MemoryStream())
