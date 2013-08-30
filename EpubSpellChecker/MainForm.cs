@@ -399,34 +399,57 @@ namespace EpubSpellChecker
                 int unknownCount = 0;
                 int ignoredCount = 0;
                 int warningCount = 0;
+
+                int occCount = 0;
+                int occSuggestionCount = 0;
+                int occFixedCount = 0;
+                int occUnknownCount = 0;
+                int occIgnoredCount = 0;
+                int occWarningCount = 0;
                 // use the full list of the word entries
                 foreach (var we in lst.OriginalList)
                 {
                     count++;
+                    occCount += we.Count;
 
                     if (we.IsUnknownWord)
+                    {
                         unknownCount++;
+                        occUnknownCount += we.Count;
+                    }
 
                     if (we.IsUnknownWord && !string.IsNullOrEmpty(we.Suggestion))
+                    {
                         suggestionCount++;
+                        occSuggestionCount += we.Count;
+                    }
 
                     if (we.IsUnknownWord && !string.IsNullOrEmpty(we.FixedText))
+                    {
                         fixedCount++;
+                        occFixedCount += we.Count;
+                    }
 
                     if (we.IsUnknownWord && we.Ignore)
+                    {
                         ignoredCount++;
+                        occIgnoredCount += we.Count;
+                    }
 
                     if (we.IsWarning)
+                    {
                         warningCount++;
+                        occWarningCount += we.Count;
+                    }
                 }
 
                 // update the labels
-                lblWordCount.Text = "Words: " + count;
-                lblUnknown.Text = "Unknown: " + unknownCount;
-                lblSuggestion.Text = "Suggestion: " + suggestionCount;
-                lblFixed.Text = "Fixed: " + fixedCount;
-                lblIgnored.Text = "Ignored: " + ignoredCount;
-                lblWarning.Text = "Warning: " + warningCount;
+                lblWordCount.Text = "Words: " + count + " [" + occCount + "]";
+                lblUnknown.Text = "Unknown: " + unknownCount + " [" + occUnknownCount + "]";
+                lblSuggestion.Text = "Suggestion: " + suggestionCount + " [" + occSuggestionCount + "]";
+                lblFixed.Text = "Fixed: " + fixedCount + " [" + occFixedCount + "]";
+                lblIgnored.Text = "Ignored: " + ignoredCount + " [" + occIgnoredCount + "]";
+                lblWarning.Text = "Warning: " + warningCount + " [" + occWarningCount + "]";
             }
         }
 
