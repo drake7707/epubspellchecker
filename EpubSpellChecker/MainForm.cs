@@ -430,13 +430,13 @@ namespace EpubSpellChecker
                     if (!string.IsNullOrEmpty(we.FixedText))
                     {
                         fixedCount++;
-                        occFixedCount += we.Count;
+                        occFixedCount += we.Occurrences.Where(occ => !occ.Ignore).Count();
                     }
 
                     if (we.IsUnknownWord && we.Ignore)
                     {
                         ignoredCount++;
-                        occIgnoredCount += we.Count;
+                        occIgnoredCount += we.Occurrences.Where(occ => !occ.Ignore).Count();
                     }
 
                     if (we.IsWarning)
@@ -684,7 +684,7 @@ namespace EpubSpellChecker
 
                 var textEntry = currentEpub.Entries[w.Href] as Epub.HtmlEntry;
 
-                int displayLength = 60;
+                int displayLength = 100;
 
                 // determine the max length of the text before and after the word
                 int min = Math.Max(w.CharOffset - displayLength, 0);
@@ -728,6 +728,7 @@ namespace EpubSpellChecker
                 itm.Ignore = !itm.Ignore;
             }
             lstOccurrences.Invalidate();
+            UpdateStatistics();
         }
 
         /// <summary>
@@ -770,6 +771,15 @@ namespace EpubSpellChecker
             using (AboutBox dlg = new AboutBox())
             {
                 dlg.ShowDialog(this);
+            }
+        }
+
+        private void lstOccurrences_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                btnIgnoreLines_Click(btnIgnoreLines, EventArgs.Empty);
+                e.Handled = true;
             }
         }
 

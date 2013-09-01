@@ -52,3 +52,5 @@ m -> th
 i <-> l
 l -> f
 T -> Y
+hn -> lm
+fi -> li
