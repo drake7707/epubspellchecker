@@ -130,7 +130,7 @@ namespace EpubSpellChecker
                         // extract the file to a a memory stream and read it to a string
                         using (MemoryStream ms = new MemoryStream())
                         {
-                            file[href].Extract(ms);
+                            file[Uri.UnescapeDataString(href)].Extract(ms);
                             ms.Position = 0;
                             StreamReader reader = new StreamReader(ms);
                             string html = reader.ReadToEnd();
@@ -177,8 +177,8 @@ namespace EpubSpellChecker
                 // remove the old entry files and add the modified html entries
                 foreach (var e in Entries.Values)
                 {
-                    newFile.RemoveEntry(e.Href);
-                    newFile.AddFileFromString(System.IO.Path.GetFileName(e.Href), System.IO.Path.GetDirectoryName(e.Href), e.Html);
+                    newFile.RemoveEntry(Uri.UnescapeDataString(e.Href));
+                    newFile.AddFileFromString(System.IO.Path.GetFileName(Uri.UnescapeDataString(e.Href)), System.IO.Path.GetDirectoryName(Uri.UnescapeDataString(e.Href)), e.Html);
                 }
                 newFile.Save(path);
             }
