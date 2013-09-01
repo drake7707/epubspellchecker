@@ -539,19 +539,26 @@ namespace EpubSpellChecker
         {
             //if (true || !we.IsUnknownWord)
             //{
-            foreach (var patternPair in ocrPatternsAppliedCount)
+            
+            foreach (var patternPair in ocrPatterns)
             {
                 foreach (var patternValue in patternPair.Value)
                 {
-                    int nrTimesApplied = patternValue.Value;
-                    if (nrTimesApplied > 2) // at least 2 times // Todo make configurable
+                    int nrTimesApplied;
+                    Dictionary<string, int> appliedPatternValue;
+                    if (ocrPatternsAppliedCount.TryGetValue(patternPair.Key, out appliedPatternValue) && appliedPatternValue.TryGetValue(patternValue, out nrTimesApplied))
                     {
+                    }
+                    else
+                        nrTimesApplied = 0;
+
+                    
                         // check if the pattern matches the current word entry
                         var matches = Regex.Matches(we.Text, patternPair.Key);
                         foreach (var m in matches.Cast<Match>())
                         {
                             // for all matches, determine the new word and check if it is present in the dictionary
-                            var newWord = we.Text.Substring(0, m.Index) + patternValue.Key + we.Text.Substring(m.Index + m.Length);
+                            var newWord = we.Text.Substring(0, m.Index) + patternValue + we.Text.Substring(m.Index + m.Length);
                             if (fullDictionary.Contains(newWord.ToLower()))
                             {
                                 // the pattern applied on the word also exists (e.g rale -> rule)
@@ -561,18 +568,23 @@ namespace EpubSpellChecker
                                 {
                                     // the new word also exists in the book, flag the word as a warning
                                     we.IsWarning = true;
-                                    we.UnknownType = "Possible OCR error";
+
+                                    if (nrTimesApplied > 0)
+                                        we.UnknownType = "Probable OCR error";
+                                    else
+                                        we.UnknownType = "Possible OCR error";
+
                                     we.Suggestion = newWord;
                                     return;
                                 }
                             }
                         }
-                    }
+                    
                 }
             }
             //}
 
-            HighProbabilityOnNeighboursTest.Test(we, true);
+            //HighProbabilityOnNeighboursTest.Test(we, true);
         }
 
         /// <summary>
