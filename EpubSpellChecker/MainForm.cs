@@ -295,6 +295,7 @@ namespace EpubSpellChecker
                 // toggle ignore of the word entry and redraw the row
                 we.Ignore = !we.Ignore;
                 grid.InvalidateRow(e.RowIndex);
+                UpdateStatistics();
             }
             else if (grid.Columns[e.ColumnIndex].Name == "AddToDictionary")
             {
@@ -307,6 +308,7 @@ namespace EpubSpellChecker
 
                 //redraw the row
                 grid.InvalidateRow(e.RowIndex);
+                UpdateStatistics();
             }
             else if (grid.Columns[e.ColumnIndex].Name == "Copy")
             {
@@ -320,6 +322,7 @@ namespace EpubSpellChecker
 
                 // redraw the row
                 grid.InvalidateRow(e.RowIndex);
+                UpdateStatistics();
             }
         }
 
@@ -424,7 +427,7 @@ namespace EpubSpellChecker
                         occSuggestionCount += we.Count;
                     }
 
-                    if (we.IsUnknownWord && !string.IsNullOrEmpty(we.FixedText))
+                    if (!string.IsNullOrEmpty(we.FixedText))
                     {
                         fixedCount++;
                         occFixedCount += we.Count;
@@ -760,6 +763,14 @@ namespace EpubSpellChecker
                 loader.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (AboutBox dlg = new AboutBox())
+            {
+                dlg.ShowDialog(this);
+            }
         }
 
 

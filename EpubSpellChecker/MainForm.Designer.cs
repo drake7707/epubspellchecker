@@ -19,9 +19,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -32,15 +30,6 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showOnlyErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.grid = new System.Windows.Forms.DataGridView();
-            this.textDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.countDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Suggestion = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Ignore = new System.Windows.Forms.DataGridViewImageColumn();
-            this.AddToDictionary = new System.Windows.Forms.DataGridViewImageColumn();
-            this.Copy = new System.Windows.Forms.DataGridViewImageColumn();
-            this.FixedText = new EpubSpellChecker.CustomAutocompleteColumn();
-            this.wordEntryBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -56,15 +45,27 @@
             this.lblWarning = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.progress = new System.Windows.Forms.ToolStripProgressBar();
-            this.btnIgnoreLines = new System.Windows.Forms.Button();
+            this.tmrFilter = new System.Windows.Forms.Timer(this.components);
+            this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Suggestion = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FixedText = new EpubSpellChecker.CustomAutocompleteColumn();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.dataGridViewImageColumn2 = new System.Windows.Forms.DataGridViewImageColumn();
             this.dataGridViewImageColumn3 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.tmrFilter = new System.Windows.Forms.Timer(this.components);
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.textDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.countDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Ignore = new System.Windows.Forms.DataGridViewImageColumn();
+            this.AddToDictionary = new System.Windows.Forms.DataGridViewImageColumn();
+            this.Copy = new System.Windows.Forms.DataGridViewImageColumn();
+            this.wordEntryBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.btnIgnoreLines = new System.Windows.Forms.Button();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.wordEntryBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -72,6 +73,7 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.wordEntryBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -79,7 +81,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
-            this.optionsToolStripMenuItem});
+            this.optionsToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(808, 24);
@@ -98,30 +101,10 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("openToolStripMenuItem.Image")));
-            this.openToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
-            this.openToolStripMenuItem.Text = "&Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
-            // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
             this.toolStripSeparator.Size = new System.Drawing.Size(143, 6);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem.Image")));
-            this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
-            this.saveToolStripMenuItem.Text = "&Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -225,87 +208,6 @@
             this.grid.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.grid_RowPrePaint);
             this.grid.SelectionChanged += new System.EventHandler(this.grid_SelectionChanged);
             this.grid.KeyDown += new System.Windows.Forms.KeyEventHandler(this.grid_KeyDown);
-            // 
-            // textDataGridViewTextBoxColumn
-            // 
-            this.textDataGridViewTextBoxColumn.DataPropertyName = "Text";
-            this.textDataGridViewTextBoxColumn.FillWeight = 159.2809F;
-            this.textDataGridViewTextBoxColumn.HeaderText = "Text";
-            this.textDataGridViewTextBoxColumn.Name = "textDataGridViewTextBoxColumn";
-            this.textDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // Type
-            // 
-            this.Type.DataPropertyName = "UnknownType";
-            this.Type.FillWeight = 105.2321F;
-            this.Type.HeaderText = "Type";
-            this.Type.Name = "Type";
-            this.Type.ReadOnly = true;
-            // 
-            // countDataGridViewTextBoxColumn
-            // 
-            this.countDataGridViewTextBoxColumn.DataPropertyName = "Count";
-            this.countDataGridViewTextBoxColumn.FillWeight = 35.99567F;
-            this.countDataGridViewTextBoxColumn.HeaderText = "Count";
-            this.countDataGridViewTextBoxColumn.Name = "countDataGridViewTextBoxColumn";
-            this.countDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // Suggestion
-            // 
-            this.Suggestion.DataPropertyName = "Suggestion";
-            this.Suggestion.FillWeight = 105.2321F;
-            this.Suggestion.HeaderText = "Suggestion";
-            this.Suggestion.Name = "Suggestion";
-            this.Suggestion.ReadOnly = true;
-            // 
-            // Ignore
-            // 
-            this.Ignore.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.Ignore.FillWeight = 20F;
-            this.Ignore.HeaderText = "";
-            this.Ignore.Image = global::EpubSpellChecker.Properties.Resources.ignore_icon_16px;
-            this.Ignore.MinimumWidth = 20;
-            this.Ignore.Name = "Ignore";
-            this.Ignore.ReadOnly = true;
-            this.Ignore.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Ignore.ToolTipText = "Ignore";
-            this.Ignore.Width = 20;
-            // 
-            // AddToDictionary
-            // 
-            this.AddToDictionary.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.AddToDictionary.FillWeight = 20F;
-            this.AddToDictionary.HeaderText = "";
-            this.AddToDictionary.Image = global::EpubSpellChecker.Properties.Resources.book_add;
-            this.AddToDictionary.MinimumWidth = 20;
-            this.AddToDictionary.Name = "AddToDictionary";
-            this.AddToDictionary.ReadOnly = true;
-            this.AddToDictionary.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.AddToDictionary.Width = 20;
-            // 
-            // Copy
-            // 
-            this.Copy.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.Copy.FillWeight = 20F;
-            this.Copy.HeaderText = "";
-            this.Copy.Image = global::EpubSpellChecker.Properties.Resources.arrow_right_blue;
-            this.Copy.MinimumWidth = 20;
-            this.Copy.Name = "Copy";
-            this.Copy.ReadOnly = true;
-            this.Copy.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Copy.ToolTipText = "Copy to fixed text";
-            this.Copy.Width = 20;
-            // 
-            // FixedText
-            // 
-            this.FixedText.DataPropertyName = "FixedText";
-            this.FixedText.FillWeight = 105.2321F;
-            this.FixedText.HeaderText = "FixedText";
-            this.FixedText.Name = "FixedText";
-            // 
-            // wordEntryBindingSource
-            // 
-            this.wordEntryBindingSource.DataSource = typeof(EpubSpellChecker.WordEntry);
             // 
             // splitContainer1
             // 
@@ -467,15 +369,41 @@
             this.progress.Size = new System.Drawing.Size(100, 16);
             this.progress.Visible = false;
             // 
-            // btnIgnoreLines
+            // tmrFilter
             // 
-            this.btnIgnoreLines.Image = global::EpubSpellChecker.Properties.Resources.ignore_icon_16px;
-            this.btnIgnoreLines.Location = new System.Drawing.Point(785, 3);
-            this.btnIgnoreLines.Name = "btnIgnoreLines";
-            this.btnIgnoreLines.Size = new System.Drawing.Size(20, 21);
-            this.btnIgnoreLines.TabIndex = 4;
-            this.btnIgnoreLines.UseVisualStyleBackColor = true;
-            this.btnIgnoreLines.Click += new System.EventHandler(this.btnIgnoreLines_Click);
+            this.tmrFilter.Interval = 250;
+            this.tmrFilter.Tick += new System.EventHandler(this.tmrFilter_Tick);
+            // 
+            // Type
+            // 
+            this.Type.DataPropertyName = "UnknownType";
+            this.Type.FillWeight = 105.2321F;
+            this.Type.HeaderText = "Type";
+            this.Type.Name = "Type";
+            this.Type.ReadOnly = true;
+            // 
+            // Suggestion
+            // 
+            this.Suggestion.DataPropertyName = "Suggestion";
+            this.Suggestion.FillWeight = 105.2321F;
+            this.Suggestion.HeaderText = "Suggestion";
+            this.Suggestion.Name = "Suggestion";
+            this.Suggestion.ReadOnly = true;
+            // 
+            // FixedText
+            // 
+            this.FixedText.DataPropertyName = "FixedText";
+            this.FixedText.FillWeight = 105.2321F;
+            this.FixedText.HeaderText = "FixedText";
+            this.FixedText.Name = "FixedText";
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "UnknownType";
+            this.dataGridViewTextBoxColumn1.HeaderText = "Type";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Width = 742;
             // 
             // dataGridViewImageColumn1
             // 
@@ -515,18 +443,108 @@
             this.dataGridViewImageColumn3.ToolTipText = "Copy to fixed text";
             this.dataGridViewImageColumn3.Width = 20;
             // 
-            // tmrFilter
+            // textDataGridViewTextBoxColumn
             // 
-            this.tmrFilter.Interval = 250;
-            this.tmrFilter.Tick += new System.EventHandler(this.tmrFilter_Tick);
+            this.textDataGridViewTextBoxColumn.DataPropertyName = "Text";
+            this.textDataGridViewTextBoxColumn.FillWeight = 159.2809F;
+            this.textDataGridViewTextBoxColumn.HeaderText = "Text";
+            this.textDataGridViewTextBoxColumn.Name = "textDataGridViewTextBoxColumn";
+            this.textDataGridViewTextBoxColumn.ReadOnly = true;
             // 
-            // dataGridViewTextBoxColumn1
+            // countDataGridViewTextBoxColumn
             // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "UnknownType";
-            this.dataGridViewTextBoxColumn1.HeaderText = "Type";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1.Width = 742;
+            this.countDataGridViewTextBoxColumn.DataPropertyName = "Count";
+            this.countDataGridViewTextBoxColumn.FillWeight = 35.99567F;
+            this.countDataGridViewTextBoxColumn.HeaderText = "Count";
+            this.countDataGridViewTextBoxColumn.Name = "countDataGridViewTextBoxColumn";
+            this.countDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // Ignore
+            // 
+            this.Ignore.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.Ignore.FillWeight = 20F;
+            this.Ignore.HeaderText = "";
+            this.Ignore.Image = global::EpubSpellChecker.Properties.Resources.ignore_icon_16px;
+            this.Ignore.MinimumWidth = 20;
+            this.Ignore.Name = "Ignore";
+            this.Ignore.ReadOnly = true;
+            this.Ignore.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Ignore.ToolTipText = "Ignore";
+            this.Ignore.Width = 20;
+            // 
+            // AddToDictionary
+            // 
+            this.AddToDictionary.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.AddToDictionary.FillWeight = 20F;
+            this.AddToDictionary.HeaderText = "";
+            this.AddToDictionary.Image = global::EpubSpellChecker.Properties.Resources.book_add;
+            this.AddToDictionary.MinimumWidth = 20;
+            this.AddToDictionary.Name = "AddToDictionary";
+            this.AddToDictionary.ReadOnly = true;
+            this.AddToDictionary.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.AddToDictionary.Width = 20;
+            // 
+            // Copy
+            // 
+            this.Copy.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.Copy.FillWeight = 20F;
+            this.Copy.HeaderText = "";
+            this.Copy.Image = global::EpubSpellChecker.Properties.Resources.arrow_right_blue;
+            this.Copy.MinimumWidth = 20;
+            this.Copy.Name = "Copy";
+            this.Copy.ReadOnly = true;
+            this.Copy.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Copy.ToolTipText = "Copy to fixed text";
+            this.Copy.Width = 20;
+            // 
+            // wordEntryBindingSource
+            // 
+            this.wordEntryBindingSource.DataSource = typeof(EpubSpellChecker.WordEntry);
+            // 
+            // btnIgnoreLines
+            // 
+            this.btnIgnoreLines.Image = global::EpubSpellChecker.Properties.Resources.ignore_icon_16px;
+            this.btnIgnoreLines.Location = new System.Drawing.Point(785, 3);
+            this.btnIgnoreLines.Name = "btnIgnoreLines";
+            this.btnIgnoreLines.Size = new System.Drawing.Size(20, 21);
+            this.btnIgnoreLines.TabIndex = 4;
+            this.btnIgnoreLines.UseVisualStyleBackColor = true;
+            this.btnIgnoreLines.Click += new System.EventHandler(this.btnIgnoreLines_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("openToolStripMenuItem.Image")));
+            this.openToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.openToolStripMenuItem.Text = "&Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem.Image")));
+            this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.saveToolStripMenuItem.Text = "&Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -542,7 +560,6 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.wordEntryBindingSource)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -553,6 +570,7 @@
             this.tableLayoutPanel2.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.wordEntryBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -605,6 +623,8 @@
         private System.Windows.Forms.ToolStripStatusLabel lblIgnored;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem wordDistributionAnalysisToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
 

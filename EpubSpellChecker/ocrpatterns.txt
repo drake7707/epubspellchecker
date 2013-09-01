@@ -51,3 +51,4 @@ orm -> om
 m -> th
 i <-> l
 l -> f
+T -> Y

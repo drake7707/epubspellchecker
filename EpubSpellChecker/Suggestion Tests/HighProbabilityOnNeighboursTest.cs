@@ -15,7 +15,7 @@ namespace EpubSpellChecker
         /// <param name="flagAsWarning">If true, also flag the word entry as IsWarning</param>
         public static void Test(WordEntry we, bool flagAsWarning)
         {
-            if (string.IsNullOrEmpty(we.UnknownType))
+            if (we.IsUnknownWord && string.IsNullOrEmpty(we.Suggestion))
             {
                 // check if there is another word that is very similar but occurs more, e.g
                 // [he] stood upright
