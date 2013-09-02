@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class NumberTest
+    [Description("Checks if the given word is a number")]
+    [DisplayName("Numbers")]
+    class NumberTest : ITest
     {
         /// <summary>
         /// Checks if the given word is a number

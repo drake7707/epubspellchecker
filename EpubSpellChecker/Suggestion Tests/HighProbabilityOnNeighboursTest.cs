@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class HighProbabilityOnNeighboursTest
+    [Description("Checks if the given word is occurring less beween its previous and/or next word than other words with the same neighbours.")]
+    [DisplayName("High probability on neighbours")]
+    class HighProbabilityOnNeighboursTest : ITest
     {
         /// <summary>
         /// Checks if the given word is occurring less beween its previous and/or next word than other words with the same neighbours.

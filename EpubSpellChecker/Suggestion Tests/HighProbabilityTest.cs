@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class HighProbabilityTest
+    [Description("Checks if a given word can be fixed by a word in the dictionary. ")]
+    [DisplayName("High probability")]
+    class HighProbabilityTest : ITest
     {
         /// <summary>
         /// Checks if a given word can be fixed by a word in the dictionary. 

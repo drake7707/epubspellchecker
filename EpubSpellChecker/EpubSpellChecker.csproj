@@ -62,8 +62,21 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Domain\Settings.cs" />
+    <Compile Include="GUI Components\BufferedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Settings\PreferencesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\PreferencesDialog.Designer.cs">
+      <DependentUpon>PreferencesDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SettingsManager.cs" />
+    <Compile Include="Settings\SimpleXmlSerializer.cs" />
     <Compile Include="Suggestion Tests\HighProbabilityOnNeighboursTest.cs" />
     <Compile Include="Suggestion Tests\HighProbabilityTest.cs" />
+    <Compile Include="Suggestion Tests\ITest.cs" />
     <Compile Include="Suggestion Tests\MissingSpacesTest.cs" />
     <Compile Include="Suggestion Tests\NameTest.cs" />
     <Compile Include="Suggestion Tests\NumberTest.cs" />
@@ -87,6 +100,7 @@
     <Compile Include="Domain\Word.cs" />
     <Compile Include="Domain\WordEntry.cs" />
     <Compile Include="Suggestion Tests\OCRErrorTest.cs" />
+    <Compile Include="Suggestion Tests\SuffixTest.cs" />
     <Compile Include="Suggestion Tests\UnnecessaryHyphenTest.cs" />
     <Compile Include="WordDistributionAnalysis.cs">
       <SubType>Form</SubType>
@@ -100,6 +114,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\PreferencesDialog.resx">
+      <DependentUpon>PreferencesDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
