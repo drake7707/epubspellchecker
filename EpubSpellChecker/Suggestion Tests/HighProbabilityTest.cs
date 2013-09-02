@@ -6,45 +6,55 @@ using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    [Description("Checks if a given word can be fixed by a word in the dictionary. ")]
+    [Description("Checks if a given word can be fixed by a word in the dictionary. The suggested word also has to be present in the book to narrow it down.")]
     [DisplayName("High probability")]
     class HighProbabilityTest : ITest
     {
         /// <summary>
-        /// Checks if a given word can be fixed by a word in the dictionary. 
-        /// If a dictionary suggestion is &gt; 80% similar and the second suggestion is lower than &lt; 80%
-        /// then it's likely that the word was intended to be written like the first suggestion
+        /// Checks if a given word can be fixed by a word in the dictionary. The suggested word also has to be present in the book to narrow it down.
         /// </summary>
         /// <param name="we">The word to check</param>
-        public static void Test(WordEntry we)
+        public static void Test(WordEntry we, Dictionary<string, WordEntry> wordsOccurences)
         {
             if (we.IsUnknownWord && !we.Ignore && string.IsNullOrEmpty(we.Suggestion))
             {
-                float treshold = 4f;
+                float treshold = 3f;
 
-                if (we.DictionarySuggesions.Length >= 2)
+                var suggestions = we.DictionarySuggesions.TakeWhile(sugg => sugg.GetDistance(we.Text) < treshold)
+                                                         .Where(sugg => wordsOccurences.ContainsKey(sugg.ToLower()))
+                                                         .ToArray();
+
+
+                if (suggestions.Length > 0)
                 {
-                    var nrOfDiff = we.DictionarySuggesions[0].GetDistance(we.Text);
-                    var nrOfDiff2 = we.DictionarySuggesions[1].GetDistance(we.Text);
-
-                    // first element has a high probability while le second is not close
-                    if (nrOfDiff < treshold && nrOfDiff2 > treshold)
-                    {
-                        we.Suggestion = we.DictionarySuggesions[0];
-                        we.UnknownType = "High probability";
-                    }
+                    we.Suggestion = suggestions.First();
+                    we.UnknownType = "High probability";
                 }
-                else if (we.DictionarySuggesions.Length == 1)
-                {
-                    var nrOfDiff = we.DictionarySuggesions[0].GetDistance(we.Text);
 
-                    // first element has a high probability
-                    if (nrOfDiff < treshold)
-                    {
-                        we.Suggestion = we.DictionarySuggesions[0];
-                        we.UnknownType = "High probability";
-                    }
-                }
+                //if (suggestions.Length >= 2)
+                //{
+
+                //    var nrOfDiff = we.DictionarySuggesions[0].GetDistance(we.Text);
+                //    var nrOfDiff2 = we.DictionarySuggesions[1].GetDistance(we.Text);
+
+                //    // first element has a high probability while le second is not close
+                //    if (nrOfDiff < treshold)// && nrOfDiff2 > treshold)
+                //    {
+                //        we.Suggestion = we.DictionarySuggesions[0];
+                //        we.UnknownType = "High probability";
+                //    }
+                //}
+                //else if (suggestions.Length == 1)
+                //{
+                //    var nrOfDiff = we.DictionarySuggesions[0].GetDistance(we.Text);
+
+                //    // first element has a high probability
+                //    if (nrOfDiff < treshold)
+                //    {
+                //        we.Suggestion = we.DictionarySuggesions[0];
+                //        we.UnknownType = "High probability";
+                //    }
+                //}
             }
         }
 
