@@ -100,6 +100,8 @@ namespace EpubSpellChecker
                 state.Text = "Building suggestions...";
                 int count = 0;
 
+                var enabledTests = new HashSet<string>(SettingsManager.GetSettings().EnabledTests);
+
                 Dictionary<string, Dictionary<string, int>> ocrPatternsAppliedCount = new Dictionary<string, Dictionary<string, int>>();
 
                 // process all word entries in parallel
@@ -109,8 +111,9 @@ namespace EpubSpellChecker
                     if (state.Cancel)
                         loop.Break();
 
+
                     // build a suggestion for the current word entry
-                    manager.FillSuggestion(we, wordEntries, ocrPatternsAppliedCount);
+                    manager.FillSuggestion(we, wordEntries, ocrPatternsAppliedCount, enabledTests);
 
                     // update the progress
                     state.Progress = count++ / (float)wordEntries.Count;
@@ -436,7 +439,7 @@ namespace EpubSpellChecker
                     if (we.IsUnknownWord && we.Ignore)
                     {
                         ignoredCount++;
-                        occIgnoredCount += we.Occurrences.Where(occ => !occ.Ignore).Count();
+                        occIgnoredCount += we.Count;
                     }
 
                     if (we.IsWarning)
@@ -479,6 +482,17 @@ namespace EpubSpellChecker
                     }
 
                     e.Handled = true;
+                }
+                else if (e.Control && e.KeyCode == Keys.C)
+                {
+                    try
+                    {
+                        Clipboard.SetText(grid.CurrentCell.Value + "");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Unable to copy the cell content to clipboard: " + ex.GetType().FullName + " - " + ex.Message);
+                    }
                 }
                 // if enter is pressed on an editable column -> start editing
                 else if (e.KeyCode == Keys.Enter)
@@ -667,52 +681,79 @@ namespace EpubSpellChecker
             // if the item is in a valid range
             if (e.Index >= 0 && e.Index < lstOccurrences.Items.Count)
             {
-                Word w = (Word)lstOccurrences.Items[e.Index];
-
-                // draw the selection if the item is selected
-                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                    e.Graphics.FillRectangle(Brushes.SkyBlue, e.Bounds);
-                else
+                using (Bitmap bmp = new Bitmap(e.Bounds.Width, e.Bounds.Height))
                 {
-                    // draw ignore as light gray background
-                    if (w.Ignore)
-                        e.Graphics.FillRectangle(Brushes.LightGray, e.Bounds);
+                    Graphics g = Graphics.FromImage(bmp);
+
+                    Word w = (Word)lstOccurrences.Items[e.Index];
+
+                    // draw the selection if the item is selected
+                    if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                        g.Clear(Color.SkyBlue);
+                    //e.Graphics.FillRectangle(Brushes.SkyBlue, e.Bounds);
                     else
-                        e.Graphics.FillRectangle(Brushes.White, e.Bounds);
-                }
-
-
-                var textEntry = currentEpub.Entries[w.Href] as Epub.HtmlEntry;
-
-                int displayLength = 100;
-
-                // determine the max length of the text before and after the word
-                int min = Math.Max(w.CharOffset - displayLength, 0);
-                int length = w.CharOffset + w.Text.Length + displayLength > textEntry.Html.Length ? textEntry.Html.Length - (w.CharOffset + w.Text.Length) : displayLength;
-
-                // build the text before and after the text
-                string prefix = "..." + textEntry.Html.Substring(min, displayLength).Replace("\r", "").Replace("\n", "");
-                // todo: this won't correctly display if the text is broken into pieces with tags inbetween. Don't use w.Text.Length, but use the last char offset instead
-                string postfix = textEntry.Html.Substring(w.OriginalCharPositions.Last() + 1, length).Replace("\r", "").Replace("\n", "") + "...";
-
-                using (var boldFont = new Font(lstOccurrences.Font, FontStyle.Bold))
-                {
-                    // measure the sizes of the parts
-                    var textSize = e.Graphics.MeasureString(w.Text, boldFont);
-                    var prefixSize = e.Graphics.MeasureString(prefix, lstOccurrences.Font);
-                    var postfixSize = e.Graphics.MeasureString(postfix, lstOccurrences.Font);
-
-                    // draw the strings
-                    using (SolidBrush br = new SolidBrush(lstOccurrences.ForeColor))
                     {
-                        float left = 0;
-                        e.Graphics.DrawString(prefix, lstOccurrences.Font, br, new RectangleF(left, e.Bounds.Top, prefixSize.Width, prefixSize.Height));
-                        left += prefixSize.Width;
-                        e.Graphics.DrawString(w.Text, boldFont, br, new RectangleF(left, e.Bounds.Top, textSize.Width, textSize.Height));
-                        left += textSize.Width;
-                        e.Graphics.DrawString(postfix, lstOccurrences.Font, br, new RectangleF(left, e.Bounds.Top, postfixSize.Width, postfixSize.Height));
+                        // draw ignore as light gray background
+                        if (w.Ignore)
+                            g.Clear(Color.LightGray);
+                            //e.Graphics.FillRectangle(Brushes.LightGray, e.Bounds);
+                        else
+                            g.Clear(Color.White);
+                            //e.Graphics.FillRectangle(Brushes.White, e.Bounds);
                     }
+
+                    int displayLength = 100;
+                    var surroundingText = GetContextOfWord(w, displayLength);
+
+                    using (var boldFont = new Font(lstOccurrences.Font, FontStyle.Bold))
+                    {
+                        // measure the sizes of the parts
+                        var textSize = e.Graphics.MeasureString(w.Text, boldFont);
+                        var prefixSize = e.Graphics.MeasureString(surroundingText.Prefix, lstOccurrences.Font);
+                        var postfixSize = e.Graphics.MeasureString(surroundingText.Postfix, lstOccurrences.Font);
+
+                        // draw the strings
+                        using (SolidBrush br = new SolidBrush(lstOccurrences.ForeColor))
+                        {
+                            float left = 0;
+                            g.DrawString(surroundingText.Prefix, lstOccurrences.Font, br, new RectangleF(left, 0, prefixSize.Width, prefixSize.Height));
+                            left += prefixSize.Width;
+                            g.DrawString(w.Text, boldFont, br, new RectangleF(left, 0, textSize.Width, textSize.Height));
+                            left += textSize.Width;
+                            g.DrawString(surroundingText.Postfix, lstOccurrences.Font, br, new RectangleF(left, 0, postfixSize.Width, postfixSize.Height));
+                        }
+                    }
+
+                    e.Graphics.DrawImage(bmp, new Point(e.Bounds.Left, e.Bounds.Top));
                 }
+            }
+        }
+
+        private SurroundingText GetContextOfWord(Word w, int displayLength)
+        {
+            var textEntry = currentEpub.Entries[w.Href] as Epub.HtmlEntry;
+
+            // determine the max length of the text before and after the word
+            int min = Math.Max(w.CharOffset - displayLength, 0);
+            int length = w.CharOffset + w.Text.Length + displayLength > textEntry.Html.Length ? textEntry.Html.Length - (w.CharOffset + w.Text.Length) : displayLength;
+
+            // build the text before and after the text
+            string prefix = "..." + textEntry.Html.Substring(min, displayLength).Replace("\r", "").Replace("\n", "");
+            // todo: this won't correctly display if the text is broken into pieces with tags inbetween. Don't use w.Text.Length, but use the last char offset instead
+            string postfix = textEntry.Html.Substring(w.OriginalCharPositions.Last() + 1, length).Replace("\r", "").Replace("\n", "") + "...";
+
+            return new SurroundingText() { Prefix = prefix, Postfix = postfix, Word = w };
+        }
+
+        private class SurroundingText
+        {
+            public string Prefix { get; set; }
+            public Word Word { get; set; }
+            public string Postfix { get; set; }
+
+            public override string ToString()
+            {
+                return Prefix + Word.Text + Postfix;
             }
         }
 
@@ -766,6 +807,11 @@ namespace EpubSpellChecker
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Occurs when the about menu is clicked, shows the about box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (AboutBox dlg = new AboutBox())
@@ -774,6 +820,13 @@ namespace EpubSpellChecker
             }
         }
 
+        /// <summary>
+        /// Occurs when a key is pressed in the occurence listbox
+        /// Toggle ignore with space
+        /// Copy text to clipboard with ctrl+c
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lstOccurrences_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Space)
@@ -781,10 +834,39 @@ namespace EpubSpellChecker
                 btnIgnoreLines_Click(btnIgnoreLines, EventArgs.Empty);
                 e.Handled = true;
             }
+            else if (e.Control && e.KeyCode == Keys.C)
+            {
+                try
+                {
+                    var word = lstOccurrences.SelectedItem as Word;
+                    if (word != null)
+                        Clipboard.SetText(GetContextOfWord(word, 100).ToString());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to copy text to clipboard: " + ex.GetType().FullName + " - " + ex.Message);
+                }
+            }
         }
 
-
+        /// <summary>
+        /// Occurs when the preferences menu is clicked, shows the preferences dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (PreferencesDialog dlg = new PreferencesDialog())
+                {
+                    dlg.ShowDialog(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error opening preferences: " + ex.GetType().FullName + " - " + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
     }
-
-
 }

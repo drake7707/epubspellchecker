@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class UnnecessaryHyphenTest
+    [Description("Tests if the word can be written without hyphens.")]
+    [DisplayName("Unnecessary hyphens")]
+    class UnnecessaryHyphenTest : ITest
     {
         /// <summary>
         /// Tests if the word can be written without hyphens. Unnecessary hyphens occurs in text when

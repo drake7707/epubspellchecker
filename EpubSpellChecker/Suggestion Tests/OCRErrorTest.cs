@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class OCRErrorTest
+    [Description("Checks if there are OCR errors in the word based on the OCR patterns file")]
+    [DisplayName("OCR Errors")]
+    class OCRErrorTest : ITest 
     {
         /// <summary>
         /// Represents the result of the OCR test

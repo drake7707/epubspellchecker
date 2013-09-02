@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class MissingSpacesTest
+    [Description("Checks if the word can be broken into seperate words")]
+    [DisplayName("Missing spaces")]
+    class MissingSpacesTest : ITest
     {
         /// <summary>
         /// Checks if the word can be broken into seperate words

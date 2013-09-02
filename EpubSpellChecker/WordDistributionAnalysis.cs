@@ -12,6 +12,9 @@ namespace EpubSpellChecker
     partial class WordDistributionAnalysis : Form
     {
 
+        /// <summary>
+        /// Represents a word entry that can be checked
+        /// </summary>
         class CheckableWordEntry : WordEntry
         {
             public CheckableWordEntry(WordEntry we)
@@ -22,6 +25,9 @@ namespace EpubSpellChecker
             }
 
             private bool check;
+            /// <summary>
+            /// Determines if the word is checked or not
+            /// </summary>
             public bool Check
             {
                 get { return check; }
@@ -41,6 +47,13 @@ namespace EpubSpellChecker
             grid.DataSource = new SortableBindingList<CheckableWordEntry>(wordEntries.Select(we => new CheckableWordEntry(we)).ToList());
         }
 
+        /// <summary>
+        /// Occurs when the generate button is clicked.
+        /// Use all checked word entries and insert the required json data
+        /// in the word chart template html
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ev"></param>
         private void btnGenerate_Click(object sender, EventArgs ev)
         {
             var lst = grid.DataSource as SortableBindingList<CheckableWordEntry>;
@@ -62,6 +75,7 @@ namespace EpubSpellChecker
 
             Dictionary<string, Dictionary<int, int>> wordCountByWord = new Dictionary<string, Dictionary<int, int>>();
 
+            // break down words into 40 classes max
             int classCount = 40;
 
             float groupSize = words.Length / (float)classCount;
@@ -82,7 +96,8 @@ namespace EpubSpellChecker
             }
 
 
-            string series = "series: [";
+            StringBuilder series = new StringBuilder();
+            series.Append("series: [");
 
             List<string> serieText = new List<string>();
             foreach (var pair in wordCountByWord)
@@ -106,13 +121,15 @@ namespace EpubSpellChecker
                 serieText.Add(serie);
             }
 
-            series += string.Join(",", serieText);
-            series += "]";
+            series.Append(string.Join(",", serieText));
+            series.Append("]");
 
             string pieData = "data: [" + string.Join(",", wordEntries.Select(we => "['" + we.Text.ProperCase() + "', " + we.Count + "]")) + "]";
 
             string html;
 
+            // checks if there is a report template available in the program folder
+            // if there isn't default to the one as embedded resource
             if (System.IO.File.Exists("wordDistributionReportTemplate.html"))
             {
                 html = System.IO.File.ReadAllText("wordDistributionReportTemplate.html");
@@ -126,14 +143,15 @@ namespace EpubSpellChecker
                 }
             }
 
-            html = html.Replace("%series%", series);
+            html = html.Replace("%series%", series.ToString());
             html = html.Replace("%pieData%", pieData);
 
 
-
+            // write to a temp file
             string tempFilename = System.IO.Path.GetTempFileName() + ".html";
             System.IO.File.WriteAllText(tempFilename, html);
 
+            // open the html file
             System.Diagnostics.Process.Start(tempFilename);
         }
 

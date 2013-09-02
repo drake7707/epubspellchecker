@@ -464,7 +464,7 @@ namespace EpubSpellChecker
         /// <param name="we">The word entry to fill the suggestion for</param>
         /// <param name="wordEntries">A collection of all the word entries</param>
         /// <param name="ocrPatternsAppliedCount">A collection that keeps track of which ocr patterns have been applied and how many times</param>
-        public void FillSuggestion(WordEntry we, Dictionary<string, WordEntry> wordEntries, Dictionary<string, Dictionary<string, int>> ocrPatternsAppliedCount)
+        public void FillSuggestion(WordEntry we, Dictionary<string, WordEntry> wordEntries, Dictionary<string, Dictionary<string, int>> ocrPatternsAppliedCount, HashSet<string> enabledTests)
         {
             if (!we.IsUnknownWord)
             {
@@ -479,53 +479,66 @@ namespace EpubSpellChecker
                 if (we.IsUnknownWord && !we.Ignore && string.IsNullOrEmpty(we.Suggestion))
                     we.DictionarySuggesions = fullDictionary
                                                     .Where(s => (char.ToLower(s[0]) == char.ToLower(we.Text[0]) || s.Last() == char.ToLower(we.Text.Last())) && Math.Abs(s.Length - we.Text.Length) <= 2) // only take the words that have a max 2 char length deviation
-                                                    .OrderBy(s => s.GetDistance(we.Text.ToLower())).Take(5).ToArray();
+                                                    .OrderBy(s => s.GetDistance(we.Text.ToLower())).Take(10).ToArray();
 
 
                 // test for numbers
-                NumberTest.Test(we);
+                if (enabledTests.Contains(typeof(NumberTest).Name))
+                    NumberTest.Test(we);
 
                 // test for OCR errors
-                OCRErrorTest.OCRResult result;
-                OCRErrorTest.Test(we, ocrPatterns, fullDictionary, out result);
-
-                // if the OCR pattern was succesfully applied, append it to the dictionary that keeps track of how many times a pattern is applied
-                if (result != null && result.IsFixed)
+                if (enabledTests.Contains(typeof(OCRErrorTest).Name))
                 {
-                    Dictionary<string, int> patternMatches;
-                    // make sure to lock the dictionary, as this is executed in parallel
-                    lock (ocrPatternsAppliedCount)
-                    {
-                        // add the pattern if it's not present
-                        if (!ocrPatternsAppliedCount.TryGetValue(result.PatternSource, out patternMatches))
-                            ocrPatternsAppliedCount[result.PatternSource] = patternMatches = new Dictionary<string, int>();
-                    }
+                    OCRErrorTest.OCRResult result;
+                    OCRErrorTest.Test(we, ocrPatterns, fullDictionary, out result);
 
-                    // lock and increase the count of the pattern or add it if it wasn't present yet
-                    lock (patternMatches)
+                    // if the OCR pattern was succesfully applied, append it to the dictionary that keeps track of how many times a pattern is applied
+                    if (result != null && result.IsFixed)
                     {
-                        int ocrCount;
-                        if (patternMatches.TryGetValue(result.PatternTarget, out ocrCount))
-                            patternMatches[result.PatternTarget] = ocrCount + 1;
-                        else
-                            patternMatches[result.PatternTarget] = 1;
+                        Dictionary<string, int> patternMatches;
+                        // make sure to lock the dictionary, as this is executed in parallel
+                        lock (ocrPatternsAppliedCount)
+                        {
+                            // add the pattern if it's not present
+                            if (!ocrPatternsAppliedCount.TryGetValue(result.PatternSource, out patternMatches))
+                                ocrPatternsAppliedCount[result.PatternSource] = patternMatches = new Dictionary<string, int>();
+                        }
+
+                        // lock and increase the count of the pattern or add it if it wasn't present yet
+                        lock (patternMatches)
+                        {
+                            int ocrCount;
+                            if (patternMatches.TryGetValue(result.PatternTarget, out ocrCount))
+                                patternMatches[result.PatternTarget] = ocrCount + 1;
+                            else
+                                patternMatches[result.PatternTarget] = 1;
+                        }
                     }
                 }
 
                 // test for name
-                NameTest.Test(we);
+                if (enabledTests.Contains(typeof(NameTest).Name))
+                    NameTest.Test(we);
+
+                // test for plurals
+                if (enabledTests.Contains(typeof(SuffixTest).Name))
+                    SuffixTest.Test(we, fullDictionary);
 
                 // test for unnecessary hyphens
-                UnnecessaryHyphenTest.Test(we, fullDictionary);
+                if (enabledTests.Contains(typeof(UnnecessaryHyphenTest).Name))
+                    UnnecessaryHyphenTest.Test(we, fullDictionary);
 
                 // test for high probability
-                HighProbabilityTest.Test(we);
+                if (enabledTests.Contains(typeof(HighProbabilityTest).Name))
+                    HighProbabilityTest.Test(we);
 
                 // test for probability on neighbours
-                HighProbabilityOnNeighboursTest.Test(we, false);
+                if (enabledTests.Contains(typeof(HighProbabilityOnNeighboursTest).Name))
+                    HighProbabilityOnNeighboursTest.Test(we, false);
 
                 // test for missing spaces
-                MissingSpacesTest.Test(we, wordEntries, fullDictionary);
+                if (enabledTests.Contains(typeof(MissingSpacesTest).Name))
+                    MissingSpacesTest.Test(we, wordEntries, fullDictionary);
             }
         }
 
@@ -539,47 +552,54 @@ namespace EpubSpellChecker
         {
             //if (true || !we.IsUnknownWord)
             //{
-            
-            foreach (var patternPair in ocrPatterns)
+
+            var settings = SettingsManager.GetSettings();
+            if (settings.OCRWarnings)
             {
-                foreach (var patternValue in patternPair.Value)
+                foreach (var patternPair in ocrPatterns)
                 {
-                    int nrTimesApplied;
-                    Dictionary<string, int> appliedPatternValue;
-                    if (ocrPatternsAppliedCount.TryGetValue(patternPair.Key, out appliedPatternValue) && appliedPatternValue.TryGetValue(patternValue, out nrTimesApplied))
+                    foreach (var patternValue in patternPair.Value)
                     {
-                    }
-                    else
-                        nrTimesApplied = 0;
-
-                    
-                        // check if the pattern matches the current word entry
-                        var matches = Regex.Matches(we.Text, patternPair.Key);
-                        foreach (var m in matches.Cast<Match>())
+                        int nrTimesApplied;
+                        Dictionary<string, int> appliedPatternValue;
+                        if (ocrPatternsAppliedCount.TryGetValue(patternPair.Key, out appliedPatternValue) && appliedPatternValue.TryGetValue(patternValue, out nrTimesApplied))
                         {
-                            // for all matches, determine the new word and check if it is present in the dictionary
-                            var newWord = we.Text.Substring(0, m.Index) + patternValue + we.Text.Substring(m.Index + m.Length);
-                            if (fullDictionary.Contains(newWord.ToLower()))
+                        }
+                        else
+                            nrTimesApplied = 0;
+
+                        bool needToWarn = !settings.OnlyUseAppliedOCRPatternsForWarnings || (settings.OnlyUseAppliedOCRPatternsForWarnings && nrTimesApplied > 0);
+
+                        if (needToWarn)
+                        {
+                            // check if the pattern matches the current word entry
+                            var matches = Regex.Matches(we.Text, patternPair.Key);
+                            foreach (var m in matches.Cast<Match>())
                             {
-                                // the pattern applied on the word also exists (e.g rale -> rule)
-                                // check if rule exists as well in the word entries
-                                WordEntry targetWordEntry;
-                                if (wordEntries.TryGetValue(newWord.ToLower(), out targetWordEntry) && targetWordEntry.Occurrences.Length > 0)
+                                // for all matches, determine the new word and check if it is present in the dictionary
+                                var newWord = we.Text.Substring(0, m.Index) + patternValue + we.Text.Substring(m.Index + m.Length);
+                                if (fullDictionary.Contains(newWord.ToLower()))
                                 {
-                                    // the new word also exists in the book, flag the word as a warning
-                                    we.IsWarning = true;
+                                    // the pattern applied on the word also exists (e.g rale -> rule)
+                                    // check if rule exists as well in the word entries
+                                    WordEntry targetWordEntry;
+                                    if (wordEntries.TryGetValue(newWord.ToLower(), out targetWordEntry) && targetWordEntry.Occurrences.Length > 0)
+                                    {
+                                        // the new word also exists in the book, flag the word as a warning
+                                        we.IsWarning = true;
 
-                                    if (nrTimesApplied > 0)
-                                        we.UnknownType = "Probable OCR error";
-                                    else
-                                        we.UnknownType = "Possible OCR error";
+                                        if (nrTimesApplied > 0)
+                                            we.UnknownType = "Probable OCR error";
+                                        else
+                                            we.UnknownType = "Possible OCR error";
 
-                                    we.Suggestion = newWord;
-                                    return;
+                                        we.Suggestion = newWord;
+                                        return;
+                                    }
                                 }
                             }
                         }
-                    
+                    }
                 }
             }
             //}

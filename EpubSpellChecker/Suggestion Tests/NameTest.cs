@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace EpubSpellChecker
 {
-    class NameTest
+    [Description("Checks if the given word is a name.")]
+    [DisplayName("Names")]
+    class NameTest : ITest
     {
 
         /// <summary>
