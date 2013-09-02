@@ -81,7 +81,7 @@ namespace EpubSpellChecker
             var wordEntries = CreateWordEntriesFromOccurrences(wordsOccurences);
 
             var wordEntry = wordEntries["be"];
-            HighProbabilityTest.Test(wordEntry);
+            HighProbabilityTest.Test(wordEntry, wordEntries);
         }
 
         /// <summary>
@@ -520,7 +520,7 @@ namespace EpubSpellChecker
                 if (enabledTests.Contains(typeof(NameTest).Name))
                     NameTest.Test(we);
 
-                // test for plurals
+                // test for suffixes
                 if (enabledTests.Contains(typeof(SuffixTest).Name))
                     SuffixTest.Test(we, fullDictionary);
 
@@ -530,7 +530,7 @@ namespace EpubSpellChecker
 
                 // test for high probability
                 if (enabledTests.Contains(typeof(HighProbabilityTest).Name))
-                    HighProbabilityTest.Test(we);
+                    HighProbabilityTest.Test(we, wordEntries);
 
                 // test for probability on neighbours
                 if (enabledTests.Contains(typeof(HighProbabilityOnNeighboursTest).Name))

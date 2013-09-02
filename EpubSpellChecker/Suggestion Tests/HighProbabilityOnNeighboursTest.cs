@@ -50,7 +50,13 @@ namespace EpubSpellChecker
                                 if (flagAsWarning)
                                     we.IsWarning = true;
                                 we.Suggestion = mostSimilar.Key.Text;
-                                we.UnknownType = "Possibility based on pattern";
+
+                                if (!string.IsNullOrEmpty(we.UnknownType))
+                                    we.UnknownType = we.UnknownType + "/";
+                                else
+                                    we.UnknownType = "";
+
+                                we.UnknownType += "Possibility based on pattern";
                                 return;
                             }
                         }
@@ -81,11 +87,17 @@ namespace EpubSpellChecker
                                     we.IsWarning = true;
 
                                 we.Suggestion = mostSimilar.Key.Text;
-                                we.UnknownType = "Possibility based on pattern";
+
+                                if (!string.IsNullOrEmpty(we.UnknownType))
+                                    we.UnknownType = we.UnknownType + "/";
+                                else
+                                    we.UnknownType = "";
+
+                                we.UnknownType += "Possibility based on pattern";
                                 return;
                             }
                         }
-                    }   
+                    }
                 }
             }
         }
