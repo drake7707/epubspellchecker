@@ -12,11 +12,17 @@ namespace EpubSpellChecker
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+
+            var frm = new MainForm();
+
+            if (args.Length >= 1 && System.IO.File.Exists(args[0]) && System.IO.Path.GetExtension(args[0]).ToLower() == ".epub")
+                frm.OpenEpub(args[0]);
+
+            Application.Run(frm);
         }
     }
 }

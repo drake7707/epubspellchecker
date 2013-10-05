@@ -91,10 +91,12 @@ namespace EpubSpellChecker
         private void LoadOCRPatterns(out List<string> warnings)
         {
             warnings = new List<string>();
-            if (System.IO.File.Exists("ocrpatterns.txt"))
+
+            var ocrPatternsFilePath = GetOCRPatternsFilePath();
+            if (System.IO.File.Exists(ocrPatternsFilePath))
             {
                 // read all lines that are not empty and don't start with # (comment)
-                foreach (var l in System.IO.File.ReadAllLines("ocrpatterns.txt").Where(l => !string.IsNullOrEmpty(l.Trim()) && !l.Trim().StartsWith("#")))
+                foreach (var l in System.IO.File.ReadAllLines(ocrPatternsFilePath).Where(l => !string.IsNullOrEmpty(l.Trim()) && !l.Trim().StartsWith("#")))
                 {
                     // if the line contains <->, the pattern needs to be applied in both ways
                     if (l.Contains("<->"))
@@ -141,6 +143,15 @@ namespace EpubSpellChecker
                 warnings.Add("No ocrpatterns.txt available, no attempt at automatically suggesting spell check fixes will be done");
         }
 
+        private static string GetOCRPatternsFilePath()
+        {
+            var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "ocrpatterns.txt");
+            if (System.IO.File.Exists(path))
+                return path;
+
+            return "ocrpatterns.txt";
+        }
+
         /// <summary>
         /// Loads the dictionary from the dictionary.txt
         /// </summary>
@@ -148,24 +159,45 @@ namespace EpubSpellChecker
         private void LoadDictionaries(out List<string> warnings)
         {
             warnings = new List<string>();
-            if (!System.IO.File.Exists("dictionary.txt"))
+
+            var dictionaryPath = GetDictionaryFilePath();
+            if (!System.IO.File.Exists(dictionaryPath))
             {
                 warnings.Add("No dictionary.txt available, add a word list to have spell checking");
             }
             else
             {
-                foreach (var l in System.IO.File.ReadAllLines("dictionary.txt").Where(l => !string.IsNullOrEmpty(l.Trim())))
+                foreach (var l in System.IO.File.ReadAllLines(dictionaryPath).Where(l => !string.IsNullOrEmpty(l.Trim())))
                     fullDictionary.Add(l.ToLower());
             }
 
-            if (System.IO.File.Exists("custom_dictionary.txt"))
+            var customDictionaryPath = GetCustomDictionaryPath();
+            if (System.IO.File.Exists(customDictionaryPath))
             {
-                foreach (var l in System.IO.File.ReadAllLines("custom_dictionary.txt").Where(l => !string.IsNullOrEmpty(l.Trim())))
+                foreach (var l in System.IO.File.ReadAllLines(customDictionaryPath).Where(l => !string.IsNullOrEmpty(l.Trim())))
                 {
                     fullDictionary.Add(l.ToLower());
                     customDictionary.Add(l.ToLower());
                 }
             }
+        }
+
+        private static string GetCustomDictionaryPath()
+        {
+            var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "custom_dictionary.txt");
+            if (System.IO.File.Exists(path))
+                return path;
+
+            return "custom_dictionary.txt";
+        }
+
+        private static string GetDictionaryFilePath()
+        {
+            var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "dictionary.txt");
+            if (System.IO.File.Exists(path))
+                return path;
+
+            return "dictionary.txt";
         }
 
         /// <summary>
@@ -920,7 +952,8 @@ namespace EpubSpellChecker
         /// </summary>
         public void SaveCustomDictionary()
         {
-            System.IO.File.WriteAllText("custom_dictionary.txt", string.Join(Environment.NewLine, customDictionary));
+            var customDictionaryPath = GetCustomDictionaryPath();
+            System.IO.File.WriteAllText(customDictionaryPath, string.Join(Environment.NewLine, customDictionary));
         }
 
         /// <summary>
