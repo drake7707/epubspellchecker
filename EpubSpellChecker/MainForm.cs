@@ -45,7 +45,7 @@ namespace EpubSpellChecker
         /// Loads an epub file and analyse all the words
         /// </summary>
         /// <param name="path">The full path to the epub file</param>
-        private void LoadFile(string path)
+        public void OpenEpub(string path)
         {
             // cancel any previous loading action and reset the grid and listbox
             grid.DataSource = null;
@@ -54,6 +54,9 @@ namespace EpubSpellChecker
 
             // read the epub file structure 
             Epub epub = Epub.FromFile(path);
+
+            // change the caption of the form with the filename
+            Text = "Epub spell checker - " + System.IO.Path.GetFileName(path);
 
             // analyse the epub async
             loader.LoadAsync<Dictionary<string, WordEntry>>((state) =>
@@ -524,9 +527,7 @@ namespace EpubSpellChecker
                     {
                         // load the epub
                         string path = ofd.FileName;
-                        LoadFile(path);
-                        // change the caption of the form with the filename
-                        Text = "Epub spell checker - " + System.IO.Path.GetFileName(ofd.FileName);
+                        OpenEpub(path);
                     }
                 }
             }
@@ -535,6 +536,7 @@ namespace EpubSpellChecker
                 MessageBox.Show(this, "The file could not be opened: " + ex.GetType().FullName + " - " + ex.Message, "File could not be opened", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         /// <summary>
         /// Occurs when the show only errors menu item is toggled
@@ -708,6 +710,8 @@ namespace EpubSpellChecker
                     using (var boldFont = new Font(lstOccurrences.Font, FontStyle.Bold))
                     {
                         // measure the sizes of the parts
+
+
                         var textSize = e.Graphics.MeasureString(w.Text, boldFont);
                         var prefixSize = e.Graphics.MeasureString(surroundingText.Prefix, lstOccurrences.Font);
                         var postfixSize = e.Graphics.MeasureString(surroundingText.Postfix, lstOccurrences.Font);
@@ -716,6 +720,8 @@ namespace EpubSpellChecker
                         using (SolidBrush br = new SolidBrush(lstOccurrences.ForeColor))
                         {
                             float left = 0;
+
+                            g.DrawRectangle(Pens.Red, left, 0, prefixSize.Width, prefixSize.Height);
                             g.DrawString(surroundingText.Prefix, lstOccurrences.Font, br, new RectangleF(left, 0, prefixSize.Width, prefixSize.Height));
                             left += prefixSize.Width;
                             g.DrawString(w.Text, boldFont, br, new RectangleF(left, 0, textSize.Width, textSize.Height));
