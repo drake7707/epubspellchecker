@@ -721,7 +721,6 @@ namespace EpubSpellChecker
                         {
                             float left = 0;
 
-                            g.DrawRectangle(Pens.Red, left, 0, prefixSize.Width, prefixSize.Height);
                             g.DrawString(surroundingText.Prefix, lstOccurrences.Font, br, new RectangleF(left, 0, prefixSize.Width, prefixSize.Height));
                             left += prefixSize.Width;
                             g.DrawString(w.Text, boldFont, br, new RectangleF(left, 0, textSize.Width, textSize.Height));
