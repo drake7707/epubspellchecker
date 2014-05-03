@@ -30,6 +30,14 @@ namespace EpubSpellChecker
                 }
                 else
                 {
+
+                    if (parts.All(part => part.CanParseToInt32()))
+                    {
+                        // 98-99, etc., most likely page numbers
+                        we.IsUnknownWord = false;
+                        we.UnknownType = ""; 
+                    }
+
                     // check if the word also exists by removing the hyphens 
                     var testWord = we.Text.Replace("-", "");
                     if (fullDictionary.Contains(testWord.ToLower()))

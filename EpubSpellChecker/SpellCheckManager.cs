@@ -45,6 +45,8 @@ namespace EpubSpellChecker
         private void DoTests()
         {
             string testHtml = "<h2>Blind<em>&#201; seer</em. <em>Fire</em>keep<br/er is&nbsp;a god. Amongst men</h2>";
+            //string testHtml = " <p>Marshall in this regard makes his own thought<sup>1</sup> entirely clear:</p>";
+
             var words = GetWords("", testHtml).GroupBy(w => w.Text.ToLower())
                                               .ToDictionary(g => g.Key, g => g.ToArray());
 
@@ -299,6 +301,13 @@ namespace EpubSpellChecker
                     str.Append('\r');
                     originalOffsets.Add(-1);
                     str.Append('\n');
+                    originalOffsets.Add(-1);
+                }
+                else if ((idx >= "<sup".Length && input.Substring(idx - "<sup".Length, "<sup".Length).ToLower() == "<sup") ||
+                         (idx >= "<sub".Length && input.Substring(idx - "<sub".Length, "<sub".Length).ToLower() == "<sub"))
+                {
+                    // superscript or subscript, ignore by adding a space
+                    str.Append(' ');
                     originalOffsets.Add(-1);
                 }
 
@@ -559,6 +568,10 @@ namespace EpubSpellChecker
                 // test for unnecessary hyphens
                 if (enabledTests.Contains(typeof(UnnecessaryHyphenTest).Name))
                     UnnecessaryHyphenTest.Test(we, fullDictionary);
+
+                // test for unnecessary diacritics
+                if (enabledTests.Contains(typeof(UnnecessaryDiacriticsTest).Name))
+                    UnnecessaryDiacriticsTest.Test(we, fullDictionary);
 
                 // test for high probability
                 if (enabledTests.Contains(typeof(HighProbabilityTest).Name))

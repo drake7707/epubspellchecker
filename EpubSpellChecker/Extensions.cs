@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using System.Globalization;
 
 namespace EpubSpellChecker
 {
@@ -26,15 +27,15 @@ namespace EpubSpellChecker
             float value;
             //if (!similarPercentageCache.TryGetValue(new KeyValuePair<string, string>(str, str2), out value))
             //{
-                var dist = EditDistance(str, str2);
-                if (str.Length > str2.Length)
-                    value = (str.Length - dist) / (float)str.Length;
-                else
-                    value = (str2.Length - dist) / (float)str2.Length;
+            var dist = EditDistance(str, str2);
+            if (str.Length > str2.Length)
+                value = (str.Length - dist) / (float)str.Length;
+            else
+                value = (str2.Length - dist) / (float)str2.Length;
 
-                // store the value in a cache, so if the same comparison comes up again we can reuse it
-                //lock (similarPercentageCache) // prevent problems in deadlock cases
-                //    similarPercentageCache[new KeyValuePair<string, string>(str, str2)] = value;
+            // store the value in a cache, so if the same comparison comes up again we can reuse it
+            //lock (similarPercentageCache) // prevent problems in deadlock cases
+            //    similarPercentageCache[new KeyValuePair<string, string>(str, str2)] = value;
             //}
             return value;
         }
@@ -190,7 +191,7 @@ namespace EpubSpellChecker
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// Removes the namespaces from the xml, so it can be read with an XmlDocument without having to worry about included namespace references
         /// </summary>
         /// <param name="root">The root xml node</param>
@@ -215,7 +216,7 @@ namespace EpubSpellChecker
         /// </summary>
         /// <param name="word">The string to trim</param>
         /// <returns>A trimmed version of the string</returns>
-        public  static string TrimSuffix(this string word)
+        public static string TrimSuffix(this string word)
         {
             int apostrapheLocation = word.IndexOf('\'');
             if (apostrapheLocation != -1)
@@ -226,6 +227,32 @@ namespace EpubSpellChecker
             return word;
         }
 
+        /// <summary>
+        /// Removes accents, umlauts, etc from a string
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static String RemoveDiacritics(this String s)
+        {
+            String normalizedString = s.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                Char c = normalizedString[i];
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(c);
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
+        public static bool CanParseToInt32(this string str)
+        {
+            int val;
+            return int.TryParse(str, out val);
+        }
     }
 
 }

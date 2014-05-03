@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\SimpleXmlSerializer.cs" />
+    <Compile Include="Suggestion Tests\UnnecessaryDiacriticsTest.cs" />
     <Compile Include="Suggestion Tests\HighProbabilityOnNeighboursTest.cs" />
     <Compile Include="Suggestion Tests\HighProbabilityTest.cs" />
     <Compile Include="Suggestion Tests\ITest.cs" />
